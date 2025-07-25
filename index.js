@@ -20,6 +20,11 @@ const corsOptions = {
       'https://engineer-brain-tool.vercel.app/'
     ];
     
+    // Allow any Vercel preview URLs for engineer-brain-tool
+    if (origin.includes('engineer-brain-tool') && origin.includes('vercel.app')) {
+      return callback(null, true);
+    }
+    
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -43,15 +48,6 @@ app.get('/api/test', (req, res) => {
 
 // --- SLOPE CALCULATION ENDPOINT ---
 app.get('/api/slope', (req, res) => {
-  // Set CORS headers for this specific endpoint
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  // Respond to CORS preflight request
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
 
   try {
     const { rise, run } = req.query;

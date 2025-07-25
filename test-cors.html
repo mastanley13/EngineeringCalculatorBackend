@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test</title>
+</head>
+<body>
+    <h1>CORS Test</h1>
+    <button onclick="testHealth()">Test Health Endpoint</button>
+    <button onclick="testSlope()">Test Slope Endpoint</button>
+    <div id="results"></div>
+
+    <script>
+        async function testHealth() {
+            try {
+                const response = await fetch('http://localhost:3001/api/health');
+                const data = await response.json();
+                document.getElementById('results').innerHTML = `<p>Health Test: ${JSON.stringify(data)}</p>`;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p>Health Test Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testSlope() {
+            try {
+                const response = await fetch('http://localhost:3001/api/slope?rise=10&run=100');
+                const data = await response.json();
+                document.getElementById('results').innerHTML = `<p>Slope Test: ${JSON.stringify(data)}</p>`;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p>Slope Test Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 
