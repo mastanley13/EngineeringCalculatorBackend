@@ -16,8 +16,8 @@ const corsOptions = {
       'http://localhost:4173',
       'https://engineering-calc-api.vercel.app',
       'https://engineering-calc-api.vercel.app/',
-      'https://engineering-calc-frontend.vercel.app',
-      'https://engineering-calc-frontend.vercel.app/'
+      'https://engineer-brain-tool.vercel.app',
+      'https://engineer-brain-tool.vercel.app/'
     ];
     
     if (allowedOrigins.indexOf(origin) !== -1) {
