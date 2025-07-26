@@ -1,0 +1,151 @@
+Here’s a complete and clear `README.md` markdown file for your **backend agent** to implement now and plan for future upgrades:
+
+---
+
+````markdown
+# 🛠️ Engineering Calc API — Backend Upgrade Instructions
+
+This document outlines required and optional enhancements for maintaining scalable, clean, and frontend-friendly serverless API endpoints.
+
+---
+
+## ✅ REQUIRED NOW (MUST COMPLETE)
+
+### 1. ✅ Add CORS Header
+
+**Why:** Enables the frontend app (if on a different origin or domain) to successfully fetch from the API without CORS errors.
+
+**How:**
+Add the following line before returning the response in each function (or abstract it into a shared utility later):
+
+```js
+res.setHeader('Access-Control-Allow-Origin', '*');
+````
+
+> In production, replace `*` with the actual frontend domain for security.
+
+---
+
+### 2. ✅ Add Input Validation
+
+**Why:** Prevents app crashes or math errors (e.g., divide by zero or invalid strings).
+
+**How:**
+Update `slope.js` to include:
+
+```js
+if (!rise || !run) {
+  return res.status(400).json({ status: 'error', message: 'Missing rise or run.' });
+}
+
+const riseNum = parseFloat(rise);
+const runNum = parseFloat(run);
+
+if (isNaN(riseNum) || isNaN(runNum) || runNum === 0) {
+  return res.status(400).json({ status: 'error', message: 'Invalid input values.' });
+}
+```
+
+---
+
+### 3. ✅ Standardize JSON Response Format
+
+**Why:** Makes it easier for the frontend to parse and display consistent responses across all calculators.
+
+**How:**
+Structure every response like this:
+
+```json
+{
+  "status": "success",
+  "result": {
+    "slope": "75.00",
+    "angle": "36.87"
+  },
+  "workShown": "markdown string here"
+}
+```
+
+**On error:**
+
+```json
+{
+  "status": "error",
+  "message": "Invalid input values."
+}
+```
+
+> Apply this format to all existing and future endpoints (`/ph`, `/beamStress`, etc.).
+
+---
+
+## 🔄 OPTIONAL FOR LATER (PLAN AHEAD)
+
+### 4. ⏳ API Versioning
+
+**Why:** Future-proofs your API. Enables `/v2/` versions to be deployed without breaking existing frontend code.
+
+**How (Later):**
+Instead of `/api/slope.js`, restructure like:
+
+```
+/api/v1/slope.js
+```
+
+In Vercel, this still maps to `https://your-app.vercel.app/api/v1/slope`.
+
+---
+
+### 5. ⏳ GPT Explanation Option (Optional AI Add-On)
+
+**Why:** Adds a “Teach Me” mode to explain the math in plain English.
+
+**How (Later):**
+
+1. Accept an optional query param:
+
+   ```
+   /api/slope?rise=3&run=4&explain=true
+   ```
+
+2. In your handler:
+
+   ```js
+   if (req.query.explain === 'true') {
+     const explanation = await generateAIExplanation(riseNum, runNum);
+     return res.status(200).json({
+       status: 'success',
+       result: { slope, angle },
+       workShown,
+       explanation
+     });
+   }
+   ```
+
+3. Use OpenAI’s API to generate the explanation:
+
+   ```js
+   const explanationPrompt = `Explain how to calculate slope given Rise=${riseNum}, Run=${runNum}. Be clear and use plain English.`;
+   ```
+
+---
+
+## 📦 Summary
+
+| Feature                  | Action                        |
+| ------------------------ | ----------------------------- |
+| ✅ CORS                   | Implement now                 |
+| ✅ Input validation       | Implement now                 |
+| ✅ JSON response format   | Implement now                 |
+| ⏳ Versioning (`/v1/...`) | Plan ahead                    |
+| ⏳ AI explanation (`GPT`) | Add when frontend supports it |
+
+Let us know when the ✅ items are completed so the frontend team can fully test and deploy.
+
+```
+
+---
+
+Let me know if you want to turn this into a GitHub issue template or make it part of a backend onboarding doc for future devs.
+```
+git 

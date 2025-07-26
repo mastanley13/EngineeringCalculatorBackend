@@ -184,9 +184,14 @@ app.use('*', (req, res) => {
   });
 });
 
-// --- START SERVER ---
-app.listen(PORT, () => {
-  console.log(`🚀 Engineering Calculator Backend running on http://localhost:${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🧮 Slope calculator: http://localhost:${PORT}/api/slope?rise=10&run=100`);
-});
+// --- START SERVER (only for local development) ---
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Engineering Calculator Backend running on http://localhost:${PORT}`);
+    console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`🧮 Slope calculator: http://localhost:${PORT}/api/slope?rise=10&run=100`);
+  });
+}
+
+// --- EXPORT FOR VERCEL ---
+module.exports = app;
