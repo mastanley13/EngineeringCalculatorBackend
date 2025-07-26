@@ -1,0 +1,19 @@
+# Test files
+*.html
+test-*.html
+debug-*.html
+
+# Documentation
+*.md
+FRONTEND_HANDOFF.md
+CORS_*.md
+
+# Development files
+deploy.ps1
+Backend_Connections_Instructions
+
+# Git
+.git/
+
+# Node modules (will be installed by Vercel)
+node_modules/ 

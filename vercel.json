@@ -8,6 +8,10 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "/index.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.js",
       "headers": {
@@ -22,5 +26,7 @@
     "index.js": {
       "maxDuration": 30
     }
-  }
+  },
+  "buildCommand": null,
+  "outputDirectory": null
 }
