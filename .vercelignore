@@ -1,14 +1,14 @@
-# Test files
-*.html
-test-*.html
-debug-*.html
-
-# Documentation (all markdown files)
+# Ignore ALL documentation files that might contain frontend references
 *.md
 FRONTEND_HANDOFF.md
 CORS_*.md
 package_issues.md
 Backend_Connections_Instructions
+
+# Test files
+*.html
+test-*.html
+debug-*.html
 
 # Development files
 deploy.ps1
@@ -23,4 +23,12 @@ node_modules/
 vite.config.*
 vite-env.d.ts
 *.config.js
-*.config.ts 
+*.config.ts
+
+# Ignore everything except essential files
+!package.json
+!package-lock.json
+!index.js
+!vercel.json
+!.vercelignore
+!vercel-build.sh 

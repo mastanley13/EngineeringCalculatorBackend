@@ -2,11 +2,13 @@
   "name": "engineering-calc-backend",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
     "build": "echo 'No build step required for Node.js API'",
-    "vercel-build": "echo 'No build step required for Node.js API'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
