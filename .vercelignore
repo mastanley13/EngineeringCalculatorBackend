@@ -30,5 +30,4 @@ vite-env.d.ts
 !package-lock.json
 !index.js
 !vercel.json
-!.vercelignore
-!vercel-build.sh 
+!.vercelignore 
