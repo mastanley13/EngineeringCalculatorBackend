@@ -3,17 +3,24 @@
 test-*.html
 debug-*.html
 
-# Documentation
+# Documentation (all markdown files)
 *.md
 FRONTEND_HANDOFF.md
 CORS_*.md
+package_issues.md
+Backend_Connections_Instructions
 
 # Development files
 deploy.ps1
-Backend_Connections_Instructions
 
 # Git
 .git/
 
 # Node modules (will be installed by Vercel)
-node_modules/ 
+node_modules/
+
+# Any potential frontend config files
+vite.config.*
+vite-env.d.ts
+*.config.js
+*.config.ts 
