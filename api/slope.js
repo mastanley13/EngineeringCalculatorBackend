@@ -1,8 +1,17 @@
 export default function handler(req, res) {
-  // Always send CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  // Set CORS headers for cross-origin requests
+  const origin = req.headers.origin;
+  
+  // Allow specific origins or all origins for development
+  if (origin && (origin.includes('engineer-brain-tool') || origin.includes('localhost'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
   // Respond to CORS preflight request
   if (req.method === 'OPTIONS') {

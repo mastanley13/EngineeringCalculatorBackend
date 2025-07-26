@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test - Engineering Calculator API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { border-color: #4CAF50; background-color: #f1f8e9; }
+        .error { border-color: #f44336; background-color: #ffebee; }
+        .info { border-color: #2196F3; background-color: #e3f2fd; }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #45a049; }
+        pre {
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Engineering Calculator API - CORS Test</h1>
+        
+        <div class="test-section info">
+            <h3>API Endpoints</h3>
+            <p><strong>Base URL:</strong> <span id="baseUrl">https://engineering-calc-api.vercel.app</span></p>
+            <p><strong>Slope Calculator:</strong> <span id="slopeUrl">https://engineering-calc-api.vercel.app/api/slope</span></p>
+            <p><strong>Health Check:</strong> <span id="healthUrl">https://engineering-calc-api.vercel.app/api/health</span></p>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test 1: Health Check</h3>
+            <button onclick="testHealth()">Test Health Endpoint</button>
+            <div id="healthResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📐 Test 2: Slope Calculator</h3>
+            <label>Rise (ft): <input type="number" id="rise" value="10" step="0.1"></label>
+            <label>Run (ft): <input type="number" id="run" value="100" step="0.1"></label>
+            <button onclick="testSlope()">Calculate Slope</button>
+            <div id="slopeResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Test 3: CORS Headers Check</h3>
+            <button onclick="checkCorsHeaders()">Check CORS Headers</button>
+            <div id="corsResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test Results Summary</h3>
+            <div id="summary"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://engineering-calc-api.vercel.app';
+        let testResults = {};
+
+        function displayResult(elementId, content, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<pre class="${isSuccess ? 'success' : 'error'}">${content}</pre>`;
+        }
+
+        function updateSummary() {
+            const summary = document.getElementById('summary');
+            const passed = Object.values(testResults).filter(r => r === true).length;
+            const total = Object.keys(testResults).length;
+            summary.innerHTML = `
+                <div class="${passed === total ? 'success' : 'error'}">
+                    <h4>Test Results: ${passed}/${total} passed</h4>
+                    <ul>
+                        ${Object.entries(testResults).map(([test, passed]) => 
+                            `<li>${test}: ${passed ? '✅ PASS' : '❌ FAIL'}</li>`
+                        ).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                
+                const result = `Status: ${response.status}
+Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}
+Data: ${JSON.stringify(data, null, 2)}`;
+                
+                displayResult('healthResult', result, response.ok);
+                testResults['Health Check'] = response.ok;
+                updateSummary();
+            } catch (error) {
+                displayResult('healthResult', `Error: ${error.message}`, false);
+                testResults['Health Check'] = false;
+                updateSummary();
+            }
+        }
+
+        async function testSlope() {
+            try {
+                const rise = document.getElementById('rise').value;
+                const run = document.getElementById('run').value;
+                
+                const response = await fetch(`${API_BASE}/api/slope?rise=${rise}&run=${run}`);
+                const data = await response.json();
+                
+                const result = `Status: ${response.status}
+Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}
+Data: ${JSON.stringify(data, null, 2)}`;
+                
+                displayResult('slopeResult', result, response.ok);
+                testResults['Slope Calculator'] = response.ok;
+                updateSummary();
+            } catch (error) {
+                displayResult('slopeResult', `Error: ${error.message}`, false);
+                testResults['Slope Calculator'] = false;
+                updateSummary();
+            }
+        }
+
+        async function checkCorsHeaders() {
+            try {
+                const response = await fetch(`${API_BASE}/api/health`, {
+                    method: 'OPTIONS'
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+                    'Access-Control-Allow-Credentials': response.headers.get('Access-Control-Allow-Credentials')
+                };
+                
+                const hasCorsHeaders = Object.values(corsHeaders).some(header => header !== null);
+                
+                const result = `CORS Headers Check:
+Status: ${response.status}
+Headers Found: ${hasCorsHeaders ? 'Yes' : 'No'}
+CORS Headers: ${JSON.stringify(corsHeaders, null, 2)}`;
+                
+                displayResult('corsResult', result, hasCorsHeaders);
+                testResults['CORS Headers'] = hasCorsHeaders;
+                updateSummary();
+            } catch (error) {
+                displayResult('corsResult', `Error: ${error.message}`, false);
+                testResults['CORS Headers'] = false;
+                updateSummary();
+            }
+        }
+
+        // Auto-run tests on page load
+        window.onload = function() {
+            setTimeout(testHealth, 1000);
+            setTimeout(() => testSlope(), 2000);
+            setTimeout(checkCorsHeaders, 3000);
+        };
+    </script>
+</body>
+</html> 

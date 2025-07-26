@@ -15,19 +15,6 @@ const corsOptions = {
     
     console.log('CORS: Request from origin:', origin);
     
-    const allowedOrigins = [
-      'http://localhost:5173', 
-      'http://localhost:3000', 
-      'http://localhost:4173',
-      'http://127.0.0.1:5173',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:4173',
-      'https://engineering-calc-api.vercel.app',
-      'https://engineering-calc-api.vercel.app/',
-      'https://engineer-brain-tool.vercel.app',
-      'https://engineer-brain-tool.vercel.app/'
-    ];
-    
     // Allow any Vercel preview URLs for engineer-brain-tool
     if (origin.includes('engineer-brain-tool') && origin.includes('vercel.app')) {
       console.log('CORS: Allowing Vercel engineer-brain-tool origin:', origin);
@@ -40,7 +27,13 @@ const corsOptions = {
       return callback(null, true);
     }
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // Allow specific production domains
+    const allowedOrigins = [
+      'https://engineer-brain-tool.vercel.app',
+      'https://engineering-calc-api.vercel.app'
+    ];
+    
+    if (allowedOrigins.includes(origin)) {
       console.log('CORS: Allowing whitelisted origin:', origin);
       callback(null, true);
     } else {
@@ -55,10 +48,28 @@ const corsOptions = {
   preflightContinue: false
 };
 
+// Apply CORS middleware
 app.use(cors(corsOptions));
 
 // Add explicit OPTIONS handling for all routes
 app.options('*', cors(corsOptions));
+
+// Fallback CORS headers for additional safety
+app.use((req, res, next) => {
+  // Set CORS headers as a fallback
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, X-Custom-Header');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  next();
+});
 
 app.use(express.json());
 
