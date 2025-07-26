@@ -1,4 +1,4 @@
-﻿export default function handler(req, res) {
+export default function handler(req, res) {
   // Always send CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');

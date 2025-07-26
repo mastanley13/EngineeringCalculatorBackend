@@ -8,12 +8,20 @@ const PORT = process.env.PORT || 3001;
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('CORS: Allowing request with no origin');
+      return callback(null, true);
+    }
+    
+    console.log('CORS: Request from origin:', origin);
     
     const allowedOrigins = [
       'http://localhost:5173', 
       'http://localhost:3000', 
       'http://localhost:4173',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:4173',
       'https://engineering-calc-api.vercel.app',
       'https://engineering-calc-api.vercel.app/',
       'https://engineer-brain-tool.vercel.app',
@@ -22,24 +30,46 @@ const corsOptions = {
     
     // Allow any Vercel preview URLs for engineer-brain-tool
     if (origin.includes('engineer-brain-tool') && origin.includes('vercel.app')) {
+      console.log('CORS: Allowing Vercel engineer-brain-tool origin:', origin);
+      return callback(null, true);
+    }
+    
+    // Allow any localhost development URLs
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      console.log('CORS: Allowing localhost development origin:', origin);
       return callback(null, true);
     }
     
     if (allowedOrigins.indexOf(origin) !== -1) {
+      console.log('CORS: Allowing whitelisted origin:', origin);
       callback(null, true);
     } else {
-      console.log('CORS blocked origin:', origin);
+      console.log('CORS: Blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-Custom-Header'],
   credentials: true,
-  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+  preflightContinue: false
 };
 
 app.use(cors(corsOptions));
+
+// Add explicit OPTIONS handling for all routes
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
+
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - Origin: ${req.headers.origin || 'No origin'} - User-Agent: ${req.headers['user-agent']?.substring(0, 50) || 'Unknown'}`);
+  next();
+});
+
+// Serve static files (for test-cors.html)
+app.use(express.static(__dirname));
 
 // --- TEST ENDPOINT ---
 app.get('/api/test', (req, res) => {
@@ -113,8 +143,26 @@ app.get('/', (req, res) => {
       test: '/api/test',
       slope: '/api/slope?rise=<value>&run=<value>',
       health: '/api/health'
+    },
+    tools: {
+      corsTest: '/test-cors.html'
     }
   });
+});
+
+// --- CORS TEST PAGE ---
+app.get('/test-cors.html', (req, res) => {
+  res.sendFile(__dirname + '/test-cors.html');
+});
+
+// --- SIMPLE TEST PAGE ---
+app.get('/test-simple.html', (req, res) => {
+  res.sendFile(__dirname + '/test-simple.html');
+});
+
+// --- CORS DEBUG PAGE ---
+app.get('/debug-cors.html', (req, res) => {
+  res.sendFile(__dirname + '/debug-cors.html');
 });
 
 // --- ERROR HANDLING MIDDLEWARE ---

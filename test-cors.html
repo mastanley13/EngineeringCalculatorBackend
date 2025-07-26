@@ -3,34 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORS Test</title>
+    <title>CORS Test - Engineering Calculator API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .endpoint {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
 </head>
 <body>
-    <h1>CORS Test</h1>
-    <button onclick="testHealth()">Test Health Endpoint</button>
-    <button onclick="testSlope()">Test Slope Endpoint</button>
-    <div id="results"></div>
+    <div class="container">
+        <h1>🔧 CORS Test - Engineering Calculator API</h1>
+        
+        <div class="test-section info">
+            <h3>📋 Test Information</h3>
+            <p><strong>Current Origin:</strong> <span id="currentOrigin"></span></p>
+            <p><strong>Active API URL:</strong> <span class="endpoint" id="activeApiUrl"></span></p>
+            <p><strong>Environment:</strong> <span id="environment"></span></p>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 API Endpoint Tests</h3>
+            <button onclick="testEndpoint('/api/health')">Test Health Endpoint</button>
+            <button onclick="testEndpoint('/api/test')">Test CORS Endpoint</button>
+            <button onclick="testEndpoint('/api/slope?rise=10&run=100')">Test Slope Endpoint</button>
+            <button onclick="testLocalEndpoint('/api/health')">Test Local Health</button>
+            <button onclick="testLocalEndpoint('/api/slope?rise=10&run=100')">Test Local Slope</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 CORS Preflight Test</h3>
+            <button onclick="testCorsPreflight()">Test CORS Preflight</button>
+            <button onclick="testCorsWithCredentials()">Test CORS with Credentials</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Results</h3>
+            <div id="results"></div>
+        </div>
+    </div>
 
     <script>
-        async function testHealth() {
+        // Auto-detect if we're running locally or in production
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE = isLocal ? 'http://localhost:3001' : 'https://engineering-calc-api.vercel.app';
+        const LOCAL_API = 'http://localhost:3001';
+
+        // Display current origin and API information
+        document.getElementById('currentOrigin').textContent = window.location.origin;
+        document.getElementById('activeApiUrl').textContent = API_BASE;
+        document.getElementById('environment').textContent = isLocal ? 'Local Development' : 'Production';
+
+        function addResult(message, isSuccess = true) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-section ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.innerHTML = `
+                <strong>${new Date().toLocaleTimeString()}</strong><br>
+                ${message}
+            `;
+            resultsDiv.insertBefore(resultDiv, resultsDiv.firstChild);
+        }
+
+        async function testEndpoint(endpoint) {
+            const url = `${API_BASE}${endpoint}`;
+            addResult(`Testing: <span class="endpoint">${url}</span>`, 'info');
+            
             try {
-                const response = await fetch('http://localhost:3001/api/health');
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
                 const data = await response.json();
-                document.getElementById('results').innerHTML = `<p>Health Test: ${JSON.stringify(data)}</p>`;
+                addResult(`
+                    ✅ Success! Status: ${response.status}<br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `, true);
             } catch (error) {
-                document.getElementById('results').innerHTML = `<p>Health Test Error: ${error.message}</p>`;
+                addResult(`
+                    ❌ Error: ${error.message}<br>
+                    <pre>${error.stack}</pre>
+                `, false);
             }
         }
 
-        async function testSlope() {
+        async function testLocalEndpoint(endpoint) {
+            const url = `${LOCAL_API}${endpoint}`;
+            addResult(`Testing Local: <span class="endpoint">${url}</span>`, 'info');
+            
             try {
-                const response = await fetch('http://localhost:3001/api/slope?rise=10&run=100');
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
                 const data = await response.json();
-                document.getElementById('results').innerHTML = `<p>Slope Test: ${JSON.stringify(data)}</p>`;
+                addResult(`
+                    ✅ Local Success! Status: ${response.status}<br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `, true);
             } catch (error) {
-                document.getElementById('results').innerHTML = `<p>Slope Test Error: ${error.message}</p>`;
+                addResult(`
+                    ❌ Local Error: ${error.message}<br>
+                    <pre>${error.stack}</pre>
+                `, false);
             }
         }
+
+        async function testCorsPreflight() {
+            const url = `${API_BASE}/api/health`;
+            addResult(`Testing CORS Preflight: <span class="endpoint">${url}</span>`, 'info');
+            
+            try {
+                // This should trigger a preflight request
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Custom-Header': 'test-value'
+                    }
+                });
+                
+                const data = await response.json();
+                addResult(`
+                    ✅ CORS Preflight Success! Status: ${response.status}<br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `, true);
+            } catch (error) {
+                addResult(`
+                    ❌ CORS Preflight Error: ${error.message}<br>
+                    <pre>${error.stack}</pre>
+                `, false);
+            }
+        }
+
+        async function testCorsWithCredentials() {
+            const url = `${API_BASE}/api/health`;
+            addResult(`Testing CORS with Credentials: <span class="endpoint">${url}</span>`, 'info');
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                addResult(`
+                    ✅ CORS with Credentials Success! Status: ${response.status}<br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `, true);
+            } catch (error) {
+                addResult(`
+                    ❌ CORS with Credentials Error: ${error.message}<br>
+                    <pre>${error.stack}</pre>
+                `, false);
+            }
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testEndpoint('/api/health');
+            }, 1000);
+        });
     </script>
 </body>
 </html> 
