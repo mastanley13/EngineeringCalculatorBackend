@@ -12,10 +12,5 @@
       "dest": "/index.js"
     }
   ],
-  "functions": {
-    "index.js": {
-      "maxDuration": 30
-    }
-  },
   "buildCommand": "npm run vercel-build"
 }
