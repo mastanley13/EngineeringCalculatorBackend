@@ -4,12 +4,56 @@
     {
       "src": "index.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "api/*.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/slope",
-      "dest": "/index.js"
+      "dest": "/api/slope.js"
+    },
+    {
+      "src": "/api/grade-percent",
+      "dest": "/api/grade-percent.js"
+    },
+    {
+      "src": "/api/slope-angle",
+      "dest": "/api/slope-angle.js"
+    },
+    {
+      "src": "/api/horizontal-distance",
+      "dest": "/api/horizontal-distance.js"
+    },
+    {
+      "src": "/api/vertical-rise",
+      "dest": "/api/vertical-rise.js"
+    },
+    {
+      "src": "/api/quadratic-equation",
+      "dest": "/api/quadratic-equation.js"
+    },
+    {
+      "src": "/api/trigonometric",
+      "dest": "/api/trigonometric.js"
+    },
+    {
+      "src": "/api/percent-error",
+      "dest": "/api/percent-error.js"
+    },
+    {
+      "src": "/api/ohms-law",
+      "dest": "/api/ohms-law.js"
+    },
+    {
+      "src": "/api/power-vi",
+      "dest": "/api/power-vi.js"
+    },
+    {
+      "src": "/api/resistance-series",
+      "dest": "/api/resistance-series.js"
     },
     {
       "src": "/(.*)",
